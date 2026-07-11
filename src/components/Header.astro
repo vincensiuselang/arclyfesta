@@ -1,0 +1,60 @@
+---
+/* Header dua mode:
+   - variant="home"    → label kiri + link turun ke #archive
+   - variant="product" → back ke index + link ke #purchase */
+interface Props {
+  variant?: 'home' | 'product';
+}
+const { variant = 'home' } = Astro.props;
+---
+
+<header
+  class="bg-background border-b border-outline-variant fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop h-20"
+>
+  {
+    variant === 'home' ? (
+      <span class="font-label-mono text-[10px] text-primary/50 tracking-widest uppercase w-24">
+        Dark Archive
+      </span>
+    ) : (
+      <a
+        href="/"
+        class="text-primary hover:text-primary/70 transition-colors duration-300 flex items-center gap-2"
+        aria-label="Kembali ke halaman utama"
+      >
+        <span class="material-symbols-outlined text-xl">arrow_back</span>
+        <span class="font-label-mono text-[10px] tracking-widest uppercase hidden md:inline">Index</span>
+      </a>
+    )
+  }
+
+  <a href="/" class="h-10 flex items-center">
+    <img
+      alt="ARCLYFESTA Monogram"
+      class="h-full w-auto object-contain"
+      src="/assets/monogram.png"
+    />
+  </a>
+
+  {
+    variant === 'home' ? (
+      <a
+        href="#archive"
+        class="text-primary hover:text-primary/70 transition-colors duration-300 flex items-center justify-end gap-2 w-24"
+        aria-label="Menuju arsip produk"
+      >
+        <span class="font-label-mono text-[10px] tracking-widest uppercase hidden md:inline">Archive</span>
+        <span class="material-symbols-outlined text-xl">south</span>
+      </a>
+    ) : (
+      <a
+        href="#purchase"
+        class="text-primary hover:text-primary/70 transition-colors duration-300 flex items-center gap-2"
+        aria-label="Menuju tautan pembelian"
+      >
+        <span class="font-label-mono text-[10px] tracking-widest uppercase hidden md:inline">Acquire</span>
+        <span class="material-symbols-outlined text-xl">shopping_bag</span>
+      </a>
+    )
+  }
+</header>

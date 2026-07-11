@@ -1,0 +1,23 @@
+---
+import { SITE } from '../config';
+---
+
+<footer
+  class="w-full max-w-[1440px] mx-auto border-t border-outline-variant px-margin-mobile md:px-margin-desktop py-8 flex flex-col md:flex-row justify-between items-center gap-6 bg-background"
+>
+  <ul class="flex flex-wrap justify-center md:justify-start gap-6 md:gap-8 items-center">
+    <li>
+      <a
+        class="font-label-mono text-[10px] text-primary/70 hover:text-primary transition-colors tracking-widest uppercase"
+        href={SITE.instagram}
+        target="_blank"
+        rel="noopener"
+      >
+        INSTAGRAM
+      </a>
+    </li>
+  </ul>
+  <p class="font-label-mono text-[10px] text-primary/40 tracking-widest uppercase">
+    {SITE.name} — EST. {SITE.est} — © {SITE.year} All Rights Reserved
+  </p>
+</footer>

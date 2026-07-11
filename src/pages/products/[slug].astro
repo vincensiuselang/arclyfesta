@@ -1,0 +1,115 @@
+---
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { SITE, PRODUCTS } from '../../config';
+
+export function getStaticPaths() {
+  return PRODUCTS.map((product) => ({
+    params: { slug: product.slug },
+    props: { product },
+  }));
+}
+
+const { product } = Astro.props;
+
+const marketplaces = [
+  { label: 'BUY ON TOKOPEDIA', href: product.links.tokopedia },
+  { label: 'BUY ON SHOPEE', href: product.links.shopee },
+  { label: 'BUY ON TIKTOK SHOP', href: product.links.tiktok },
+];
+---
+
+<Base
+  title={`${product.name.toUpperCase()} ${product.code} — ${product.type} | ${SITE.name}`}
+  description={`${product.name.toUpperCase()} ${product.code} — ${product.type}. ${product.subtitle}. ${SITE.name} Archive Record.`}
+>
+  <Header variant="product" />
+
+  <main
+    class="flex-grow pt-28 pb-12 flex flex-col z-10 w-full max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop"
+  >
+    <div
+      class="flex-grow grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 auto-rows-min border border-outline-variant bg-surface-container-lowest"
+    >
+      <!-- Header Section -->
+      <div
+        class="col-span-1 md:col-span-2 lg:col-span-12 border-b border-outline-variant p-6 md:p-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-8 bg-surface/50"
+      >
+        <div>
+          <p class="font-label-mono text-[10px] text-primary/50 tracking-widest uppercase mb-4 block">
+            Archive Record // {product.code}
+          </p>
+          <h2
+            class="text-[56px] md:text-display-xl text-primary uppercase leading-none font-display-xl tracking-tighter"
+            style='font-family: "Cloister Black", serif;'
+          >
+            {product.name}<br />{product.code}
+          </h2>
+        </div>
+        <div class="md:text-right">
+          <p class="font-label-mono text-label-mono text-primary/80 tracking-[0.2em] uppercase">
+            {product.type}
+          </p>
+          <p class="font-label-mono text-[10px] text-primary/50 tracking-widest mt-2 uppercase">
+            {product.subtitle}
+          </p>
+        </div>
+      </div>
+
+      <!-- Technical Imagery -->
+      <div
+        class="col-span-1 md:col-span-1 lg:col-span-7 border-b md:border-b-0 md:border-r border-outline-variant bg-background overflow-hidden relative min-h-[400px] md:min-h-[500px] flex items-center justify-center p-8"
+      >
+        <img
+          src={product.image}
+          alt={`${product.name.toUpperCase()} ${product.code} — ${product.type} technical sheet`}
+          class="w-full h-full object-contain"
+        />
+      </div>
+
+      <!-- Details & Purchasing -->
+      <div class="col-span-1 md:col-span-1 lg:col-span-5 flex flex-col bg-surface-container-lowest">
+        <!-- Technical Data -->
+        <div class="flex-grow p-6 md:p-8 flex flex-col justify-center gap-8 border-b border-outline-variant">
+          <div class="grid grid-cols-2 gap-y-8 gap-x-4">
+            {
+              product.specs.map((spec) => (
+                <div class="flex flex-col gap-2">
+                  <span class="font-label-mono text-[10px] text-primary/50 uppercase tracking-widest border-b border-outline-variant/50 pb-1">
+                    {spec.label}
+                  </span>
+                  <span class="font-label-mono text-xs text-primary uppercase">{spec.value}</span>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- Marketplace Links (isi link-nya di src/config.ts) -->
+        <div id="purchase" class="flex flex-col bg-background">
+          {
+            marketplaces.map((mp, i) => (
+              <a
+                class:list={[
+                  'group flex items-center justify-between p-6 hover:bg-surface-variant transition-colors',
+                  i < marketplaces.length - 1 && 'border-b border-outline-variant',
+                ]}
+                href={mp.href}
+                target="_blank"
+                rel="noopener"
+              >
+                <span class="font-label-mono text-xs text-primary tracking-widest uppercase">{mp.label}</span>
+                <span class="material-symbols-outlined text-primary text-sm transition-transform group-hover:translate-x-1">
+                  arrow_forward
+                </span>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Base>
