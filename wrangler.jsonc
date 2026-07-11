@@ -12,7 +12,7 @@
     {
       "binding": "STOCK",
       // ↓↓↓ GANTI DENGAN ID KV NAMESPACE LU (lihat README bagian "Setup Stock & Admin") ↓↓↓
-      "id": "PASTE_ID_KV_LU_DISINI"
+      "id": "75329be6e5a449729dd561e74dbe23c8"
     }
   ]
 }
