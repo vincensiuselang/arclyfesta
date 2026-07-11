@@ -11,8 +11,7 @@ export const SITE = {
   est: 2024,
   year: 2026,
 
-  // ↓↓↓ GANTI DENGAN LINK INSTAGRAM LU ↓↓↓
-  instagram: '#',
+  instagram: 'https://www.instagram.com/arclyfesta?igsh=ZjQ5OWFoMXB4ZTZw',
 };
 
 export interface Product {
@@ -47,8 +46,8 @@ export const PRODUCTS: Product[] = [
     ],
     links: {
       tokopedia: '#', // ← GANTI LINK TOKOPEDIA DI SINI
-      shopee: '#', // ← GANTI LINK SHOPEE DI SINI
-      tiktok: '#', // ← GANTI LINK TIKTOK SHOP DI SINI
+      shopee: 'https://shopee.co.id/arclyfe_style',
+      tiktok: 'https://vt.tiktok.com/ZSXLSt6Jy/?page=Mall',
     },
   },
 
