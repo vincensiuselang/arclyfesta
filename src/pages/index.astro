@@ -87,6 +87,10 @@ import { SITE, PRODUCTS, NEXT_RECORD } from '../config';
                     <p class="font-label-mono text-[10px] text-primary/50 tracking-widest uppercase mt-2">
                       {product.subtitle}
                     </p>
+                    <p
+                      data-stock-badge={product.slug}
+                      class="font-label-mono text-[10px] tracking-[0.2em] uppercase mt-2 hidden"
+                    ></p>
                   </div>
                   <span class="material-symbols-outlined text-primary text-sm transition-transform group-hover:translate-x-1">
                     arrow_forward
@@ -124,3 +128,24 @@ import { SITE, PRODUCTS, NEXT_RECORD } from '../config';
 
   <Footer />
 </Base>
+
+<script>
+  // Badge stock di kartu produk homepage
+  fetch('/api/stock')
+    .then((r) => r.json())
+    .then((data) => {
+      document.querySelectorAll<HTMLElement>('[data-stock-badge]').forEach((badge) => {
+        const stock = data[badge.dataset.stockBadge!];
+        if (stock === undefined) return;
+        badge.classList.remove('hidden');
+        if (stock > 0) {
+          badge.textContent = `STOCK: ${stock}`;
+          badge.classList.add('text-primary/60');
+        } else {
+          badge.textContent = 'SOLD OUT';
+          badge.classList.add('text-error');
+        }
+      });
+    })
+    .catch(() => {});
+</script>

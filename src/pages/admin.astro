@@ -1,0 +1,173 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE, PRODUCTS } from '../config';
+
+const products = PRODUCTS.map((p) => ({ slug: p.slug, label: `${p.name} ${p.code} — ${p.type}`.toUpperCase() }));
+---
+
+<Base title={`Admin | ${SITE.name}`} description="Admin panel">
+  <header
+    class="bg-background border-b border-outline-variant fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop h-20"
+  >
+    <a href="/" class="font-label-mono text-[10px] text-primary/50 hover:text-primary transition-colors tracking-widest uppercase">← Back to site</a>
+    <img alt="ARCLYFESTA Monogram" class="h-10 w-auto object-contain" src="/assets/monogram.png" />
+    <button
+      id="logout-btn"
+      class="font-label-mono text-[10px] text-primary/50 hover:text-primary transition-colors tracking-widest uppercase hidden"
+    >Logout</button>
+  </header>
+
+  <main class="flex-grow pt-32 pb-24 w-full max-w-2xl mx-auto px-margin-mobile md:px-0 flex flex-col">
+    <p class="font-label-mono text-[10px] text-primary/50 tracking-widest uppercase mb-4">
+      {SITE.name} // Restricted Access
+    </p>
+    <h1 class="text-headline-lg-mobile md:text-headline-lg font-headline-lg uppercase text-primary mb-12">Admin</h1>
+
+    <!-- LOGIN -->
+    <section id="login-panel" class="border border-outline-variant bg-surface-container-lowest p-8 flex flex-col gap-8">
+      <div class="flex flex-col gap-2">
+        <label for="password" class="font-label-mono text-[10px] text-primary/50 uppercase tracking-widest">Admin Password</label>
+        <input
+          id="password"
+          type="password"
+          autocomplete="current-password"
+          class="bg-transparent border-0 border-b border-primary rounded-none px-0 py-2 font-label-mono text-sm text-primary focus:ring-0 focus:border-primary w-full"
+        />
+      </div>
+      <p id="login-error" class="font-label-mono text-[10px] text-error tracking-widest uppercase hidden">Password salah.</p>
+      <button
+        id="login-btn"
+        class="self-start inline-flex items-center gap-3 bg-primary text-on-primary font-label-mono text-xs tracking-widest uppercase px-8 py-4 border border-primary hover:bg-background hover:text-primary transition-colors duration-300"
+      >Login</button>
+    </section>
+
+    <!-- PANEL STOCK -->
+    <section id="stock-panel" class="hidden border border-outline-variant bg-surface-container-lowest">
+      <div class="border-b border-outline-variant p-6 flex justify-between items-end">
+        <p class="font-label-mono text-[10px] text-primary/50 tracking-widest uppercase">Inventory // Records</p>
+        <p class="font-label-mono text-[10px] text-primary/50 tracking-widest uppercase">Stock 0 = Sold Out</p>
+      </div>
+
+      <div id="product-rows">
+        {
+          products.map((p) => (
+            <div class="border-b border-outline-variant p-6 flex flex-col md:flex-row md:items-center justify-between gap-4" data-row={p.slug}>
+              <span class="font-label-mono text-xs text-primary tracking-widest uppercase">{p.label}</span>
+              <div class="flex items-center gap-3">
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  data-stock-input={p.slug}
+                  class="bg-transparent border border-outline-variant rounded-none w-24 px-3 py-2 font-label-mono text-sm text-primary text-right focus:ring-0 focus:border-primary"
+                />
+                <button
+                  data-soldout={p.slug}
+                  class="font-label-mono text-[10px] tracking-widest uppercase border border-outline-variant px-4 py-2.5 text-primary/70 hover:text-error hover:border-error transition-colors"
+                >Sold Out</button>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+
+      <div class="p-6 flex items-center justify-between gap-4">
+        <p id="save-status" class="font-label-mono text-[10px] tracking-widest uppercase text-primary/50"></p>
+        <button
+          id="save-btn"
+          class="inline-flex items-center gap-3 bg-primary text-on-primary font-label-mono text-xs tracking-widest uppercase px-8 py-4 border border-primary hover:bg-background hover:text-primary transition-colors duration-300"
+        >Save Changes</button>
+      </div>
+    </section>
+  </main>
+</Base>
+
+<script>
+  const $ = (s: string) => document.querySelector(s) as HTMLElement;
+  const loginPanel = $('#login-panel');
+  const stockPanel = $('#stock-panel');
+  const loginError = $('#login-error');
+  const saveStatus = $('#save-status');
+  const logoutBtn = $('#logout-btn');
+  const passwordInput = document.getElementById('password') as HTMLInputElement;
+
+  const getKey = () => sessionStorage.getItem('arclyfesta-admin-key') || '';
+
+  async function verify(key: string): Promise<boolean> {
+    const res = await fetch('/api/stock', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-admin-key': key },
+      body: JSON.stringify({ stocks: {} }),
+    });
+    return res.ok;
+  }
+
+  async function loadStocks() {
+    const res = await fetch('/api/stock');
+    const data = await res.json();
+    document.querySelectorAll<HTMLInputElement>('[data-stock-input]').forEach((input) => {
+      const slug = input.dataset.stockInput!;
+      if (data[slug] !== undefined) input.value = String(data[slug]);
+    });
+  }
+
+  function showPanel() {
+    loginPanel.classList.add('hidden');
+    stockPanel.classList.remove('hidden');
+    logoutBtn.classList.remove('hidden');
+    loadStocks();
+  }
+
+  async function login() {
+    loginError.classList.add('hidden');
+    const key = passwordInput.value.trim();
+    if (!key) return;
+    if (await verify(key)) {
+      sessionStorage.setItem('arclyfesta-admin-key', key);
+      showPanel();
+    } else {
+      loginError.classList.remove('hidden');
+    }
+  }
+
+  $('#login-btn').addEventListener('click', login);
+  passwordInput.addEventListener('keydown', (e) => e.key === 'Enter' && login());
+
+  logoutBtn.addEventListener('click', () => {
+    sessionStorage.removeItem('arclyfesta-admin-key');
+    location.reload();
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('[data-soldout]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const input = document.querySelector<HTMLInputElement>(`[data-stock-input="${btn.dataset.soldout}"]`);
+      if (input) input.value = '0';
+    });
+  });
+
+  $('#save-btn').addEventListener('click', async () => {
+    const stocks: Record<string, number> = {};
+    document.querySelectorAll<HTMLInputElement>('[data-stock-input]').forEach((input) => {
+      if (input.value !== '') stocks[input.dataset.stockInput!] = Number(input.value);
+    });
+    saveStatus.textContent = 'Saving...';
+    const res = await fetch('/api/stock', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-admin-key': getKey() },
+      body: JSON.stringify({ stocks }),
+    });
+    if (res.ok) {
+      saveStatus.textContent = 'Saved ✓';
+      setTimeout(() => (saveStatus.textContent = ''), 3000);
+    } else if (res.status === 401) {
+      saveStatus.textContent = 'Session invalid — login ulang';
+      sessionStorage.removeItem('arclyfesta-admin-key');
+      setTimeout(() => location.reload(), 1500);
+    } else {
+      saveStatus.textContent = 'Gagal menyimpan';
+    }
+  });
+
+  // Auto-login kalau session masih ada
+  if (getKey()) verify(getKey()).then((ok) => ok && showPanel());
+</script>

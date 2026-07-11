@@ -54,6 +54,11 @@ const marketplaces = [
           <p class="font-label-mono text-[10px] text-primary/50 tracking-widest mt-2 uppercase">
             {product.subtitle}
           </p>
+          <p
+            id="stock-indicator"
+            data-slug={product.slug}
+            class="font-label-mono text-xs tracking-[0.2em] mt-4 uppercase hidden"
+          ></p>
         </div>
       </div>
 
@@ -98,8 +103,9 @@ const marketplaces = [
                 href={mp.href}
                 target="_blank"
                 rel="noopener"
+                data-buy-link
               >
-                <span class="font-label-mono text-xs text-primary tracking-widest uppercase">{mp.label}</span>
+                <span class="font-label-mono text-xs text-primary tracking-widest uppercase" data-buy-label>{mp.label}</span>
                 <span class="material-symbols-outlined text-primary text-sm transition-transform group-hover:translate-x-1">
                   arrow_forward
                 </span>
@@ -113,3 +119,34 @@ const marketplaces = [
 
   <Footer />
 </Base>
+
+<script>
+  // Ambil stock dari API, tampilkan angka / SOLD OUT, matikan tombol beli kalau habis
+  const indicator = document.getElementById('stock-indicator');
+  const slug = indicator?.dataset.slug;
+
+  if (indicator && slug) {
+    fetch('/api/stock')
+      .then((r) => r.json())
+      .then((data) => {
+        const stock = data[slug];
+        if (stock === undefined) return; // belum di-set admin → gak nampilin apa-apa
+
+        indicator.classList.remove('hidden');
+        if (stock > 0) {
+          indicator.textContent = `STOCK: ${stock}`;
+          indicator.classList.add('text-primary/80');
+        } else {
+          indicator.textContent = 'SOLD OUT';
+          indicator.classList.add('text-error');
+          document.querySelectorAll('[data-buy-link]').forEach((link) => {
+            link.classList.add('pointer-events-none', 'opacity-30');
+            (link as HTMLAnchorElement).removeAttribute('href');
+            const label = link.querySelector('[data-buy-label]');
+            if (label) label.textContent = `${label.textContent} — SOLD OUT`;
+          });
+        }
+      })
+      .catch(() => {});
+  }
+</script>

@@ -34,6 +34,22 @@ npm run dev      # buka http://localhost:4321
 
 Alternatif tanpa Git: `npm run build` lalu upload folder `dist/` via **Direct Upload** di Cloudflare Pages.
 
+## Setup Stock & Admin (sekali aja)
+
+Fitur stock butuh 2 hal di Cloudflare sebelum deploy:
+
+1. **Bikin KV Namespace** (tempat nyimpan data stock):
+   Dashboard Cloudflare → **Storage & Databases** → **KV** → **Create namespace** → nama: `arclyfesta-stock` → Create.
+   Copy **ID**-nya, lalu paste ke `wrangler.jsonc` menggantikan `PASTE_ID_KV_LU_DISINI`.
+
+2. **Set password admin:**
+   Dashboard → **Workers & Pages** → project `arclyfesta` → **Settings** → **Variables and Secrets** → **Add** → Type: **Secret** → Name: `ADMIN_PASSWORD` → Value: password lu → Save.
+
+Setelah itu push seperti biasa. Panel admin ada di `https://domain-lu/admin`:
+login pakai password → atur angka stock tiap produk → Save.
+Stock 0 = SOLD OUT (badge merah + tombol beli mati di halaman produk).
+Produk yang belum pernah di-set stock-nya tidak menampilkan apa-apa.
+
 ## Struktur
 
 ```
