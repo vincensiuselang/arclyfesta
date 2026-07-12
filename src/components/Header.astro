@@ -36,25 +36,36 @@ const { variant = 'home' } = Astro.props;
     />
   </a>
 
-  {
-    variant === 'home' ? (
-      <a
-        href="#archive"
-        class="text-primary hover:text-primary/70 transition-colors duration-300 flex items-center justify-end gap-2 w-24"
-        aria-label="Menuju arsip produk"
-      >
-        <span class="font-label-mono text-[10px] tracking-widest uppercase hidden md:inline">Archive</span>
-        <span class="material-symbols-outlined text-xl">south</span>
-      </a>
-    ) : (
-      <a
-        href="#purchase"
-        class="text-primary hover:text-primary/70 transition-colors duration-300 flex items-center gap-2"
-        aria-label="Menuju tautan pembelian"
-      >
-        <span class="font-label-mono text-[10px] tracking-widest uppercase hidden md:inline">Acquire</span>
-        <span class="material-symbols-outlined text-xl">shopping_bag</span>
-      </a>
-    )
-  }
+  <div class="flex items-center gap-4 md:gap-8">
+    <!-- Language Switcher -->
+    <div class="flex items-center gap-2 font-label-mono text-[10px] tracking-widest uppercase" aria-label="Pilih bahasa">
+      <button data-lang="en" class="text-primary/40 hover:text-primary transition-colors">EN</button>
+      <span class="text-primary/30">/</span>
+      <button data-lang="id" class="text-primary/40 hover:text-primary transition-colors">ID</button>
+      <span class="text-primary/30">/</span>
+      <button data-lang="zh" class="text-primary/40 hover:text-primary transition-colors">中文</button>
+    </div>
+
+    {
+      variant === 'home' ? (
+        <a
+          href="#archive"
+          class="text-primary hover:text-primary/70 transition-colors duration-300 flex items-center justify-end gap-2"
+          aria-label="Menuju arsip produk"
+        >
+          <span class="font-label-mono text-[10px] tracking-widest uppercase hidden md:inline">Archive</span>
+          <span class="material-symbols-outlined text-xl">south</span>
+        </a>
+      ) : (
+        <a
+          href="#purchase"
+          class="text-primary hover:text-primary/70 transition-colors duration-300 flex items-center gap-2"
+          aria-label="Menuju tautan pembelian"
+        >
+          <span class="font-label-mono text-[10px] tracking-widest uppercase hidden md:inline">Acquire</span>
+          <span class="material-symbols-outlined text-xl">shopping_bag</span>
+        </a>
+      )
+    }
+  </div>
 </header>

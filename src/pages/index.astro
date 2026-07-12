@@ -27,14 +27,14 @@ import { SITE, PRODUCTS, NEXT_RECORD } from '../config';
         The<br />Archive<br />Beyond
       </h1> -->
       <p class="font-body-md text-body-md text-primary/60 mt-10 max-w-md">
-        "The archive begins with Record 0000. Everything after is another entry."
+        <span data-i18n="hero_quote">"The archive begins with Record 0000. Everything after is another entry."</span>
       </p>
       <div class="mt-12">
         <a
           href="#archive"
           class="inline-flex items-center gap-3 bg-primary text-on-primary font-label-mono text-xs tracking-widest uppercase px-8 py-4 border border-primary hover:bg-background hover:text-primary transition-colors duration-300"
         >
-          View Archive
+          <span data-i18n="view_archive">View Archive</span>
           <span class="material-symbols-outlined text-sm">arrow_downward</span>
         </a>
       </div>
@@ -108,7 +108,7 @@ import { SITE, PRODUCTS, NEXT_RECORD } from '../config';
             >
               {NEXT_RECORD}
             </span>
-            <p class="font-label-mono text-[10px] text-primary/30 tracking-widest uppercase">Coming Soon</p>
+            <p class="font-label-mono text-[10px] text-primary/30 tracking-widest uppercase" data-i18n="coming_soon">Coming Soon</p>
           </div>
         </div>
       </div>
@@ -121,14 +121,14 @@ import { SITE, PRODUCTS, NEXT_RECORD } from '../config';
         <p class="font-label-mono text-[10px] text-primary/50 tracking-widest uppercase mt-2">Dark Archive</p>
 
         <div class="flex flex-col gap-4 mt-12 font-headline-lg text-primary/80 text-xl md:text-2xl leading-snug">
-          <p>The archive is never complete.</p>
-          <p>Every release is catalogued.</p>
-          <p>Every garment is numbered.</p>
-          <p>Nothing is reproduced exactly.</p>
-          <p>Nothing exists outside the archive.</p>
+          <p data-i18n="m1">The archive is never complete.</p>
+          <p data-i18n="m2">Every release is catalogued.</p>
+          <p data-i18n="m3">Every garment is numbered.</p>
+          <p data-i18n="m4">Nothing is reproduced exactly.</p>
+          <p data-i18n="m5">Nothing exists outside the archive.</p>
         </div>
 
-        <p class="text-headline-lg-mobile md:text-headline-lg text-primary font-headline-lg leading-tight mt-12">
+        <p class="text-headline-lg-mobile md:text-headline-lg text-primary font-headline-lg leading-tight mt-12" data-i18n="archive_begins">
           The Archive Begins.
         </p>
       </div>
@@ -139,22 +139,35 @@ import { SITE, PRODUCTS, NEXT_RECORD } from '../config';
 </Base>
 
 <script>
+  import { jsStrings, getLang } from '../i18n';
+
   // Badge stock di kartu produk homepage
+  let stockData: Record<string, number> = {};
+
+  function renderBadges() {
+    const s = jsStrings[getLang()] ?? jsStrings.en;
+    document.querySelectorAll<HTMLElement>('[data-stock-badge]').forEach((badge) => {
+      const stock = stockData[badge.dataset.stockBadge!];
+      if (stock === undefined) return;
+      badge.classList.remove('hidden');
+      if (stock > 0) {
+        badge.textContent = `${s.stock}${stock}`;
+        badge.classList.add('text-primary/60');
+        badge.classList.remove('text-error');
+      } else {
+        badge.textContent = s.soldOut;
+        badge.classList.add('text-error');
+        badge.classList.remove('text-primary/60');
+      }
+    });
+  }
+
   fetch('/api/stock')
     .then((r) => r.json())
     .then((data) => {
-      document.querySelectorAll<HTMLElement>('[data-stock-badge]').forEach((badge) => {
-        const stock = data[badge.dataset.stockBadge!];
-        if (stock === undefined) return;
-        badge.classList.remove('hidden');
-        if (stock > 0) {
-          badge.textContent = `STOCK: ${stock}`;
-          badge.classList.add('text-primary/60');
-        } else {
-          badge.textContent = 'SOLD OUT';
-          badge.classList.add('text-error');
-        }
-      });
+      stockData = data;
+      renderBadges();
     })
     .catch(() => {});
+  document.addEventListener('langchange', renderBadges);
 </script>

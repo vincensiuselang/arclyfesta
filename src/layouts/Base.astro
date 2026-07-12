@@ -35,5 +35,32 @@ const { title, description = SITE.description, track = true } = Astro.props;
   >
     <slot />
     {track && <script is:inline>fetch('/api/visit', { method: 'POST' }).catch(function () {});</script>}
+    <script>
+      import { translations, getLang } from '../i18n';
+
+      function applyLang(lang: string) {
+        document.documentElement.lang = lang;
+        document.querySelectorAll<HTMLElement>('[data-i18n]').forEach((el) => {
+          const key = el.dataset.i18n!;
+          // simpan teks asli (EN) sekali
+          if (!el.dataset.i18nEn) el.dataset.i18nEn = el.textContent ?? '';
+          el.textContent = lang === 'en' ? el.dataset.i18nEn : (translations[lang]?.[key] ?? el.dataset.i18nEn);
+        });
+        document.querySelectorAll<HTMLElement>('[data-lang]').forEach((btn) => {
+          const active = btn.dataset.lang === lang;
+          btn.classList.toggle('text-primary', active);
+          btn.classList.toggle('text-primary/40', !active);
+        });
+        try {
+          localStorage.setItem('arclyfesta-lang', lang);
+        } catch {}
+        document.dispatchEvent(new CustomEvent('langchange', { detail: lang }));
+      }
+
+      applyLang(getLang());
+      document.querySelectorAll<HTMLElement>('[data-lang]').forEach((btn) => {
+        btn.addEventListener('click', () => applyLang(btn.dataset.lang!));
+      });
+    </script>
   </body>
 </html>
