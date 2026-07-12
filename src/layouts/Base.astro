@@ -5,9 +5,10 @@ import { SITE } from '../config';
 interface Props {
   title: string;
   description?: string;
+  track?: boolean; // false = halaman gak dihitung visitor (dipakai di /admin)
 }
 
-const { title, description = SITE.description } = Astro.props;
+const { title, description = SITE.description, track = true } = Astro.props;
 ---
 
 <!doctype html>
@@ -33,5 +34,6 @@ const { title, description = SITE.description } = Astro.props;
     class="antialiased min-h-screen flex flex-col selection:bg-surface-variant selection:text-primary relative bg-background text-primary"
   >
     <slot />
+    {track && <script is:inline>fetch('/api/visit', { method: 'POST' }).catch(function () {});</script>}
   </body>
 </html>

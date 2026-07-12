@@ -5,7 +5,7 @@ import { SITE, PRODUCTS } from '../config';
 const products = PRODUCTS.map((p) => ({ slug: p.slug, label: `${p.name} ${p.code} — ${p.type}`.toUpperCase() }));
 ---
 
-<Base title={`Admin | ${SITE.name}`} description="Admin panel">
+<Base title={`Admin | ${SITE.name}`} description="Admin panel" track={false}>
   <header
     class="bg-background border-b border-outline-variant fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop h-20"
   >
@@ -71,13 +71,45 @@ const products = PRODUCTS.map((p) => ({ slug: p.slug, label: `${p.name} ${p.code
         }
       </div>
 
+      <!-- VISITORS -->
+      <div class="border-b border-outline-variant p-6">
+        <div class="flex justify-between items-center mb-6">
+          <p class="font-label-mono text-[10px] text-primary/50 tracking-widest uppercase">Visitors</p>
+          <div class="flex items-center gap-6">
+            <button
+              id="reset-visits"
+              class="font-label-mono text-[10px] tracking-widest uppercase text-primary/50 hover:text-error transition-colors"
+            >Reset Counter</button>
+            <p class="font-label-mono text-[10px] tracking-widest uppercase text-primary/50">
+              <span class="inline-block w-2 h-2 bg-error mr-2 animate-pulse"></span>LIVE
+            </p>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="border border-outline-variant p-4 flex flex-col gap-1">
+            <span class="font-label-mono text-[10px] text-primary/50 uppercase tracking-widest">Online Now (5 Min)</span>
+            <span id="visitors-online" class="font-label-mono text-2xl text-primary">—</span>
+          </div>
+          <div class="border border-outline-variant p-4 flex flex-col gap-1">
+            <span class="font-label-mono text-[10px] text-primary/50 uppercase tracking-widest">Total Views</span>
+            <span id="visitors-total" class="font-label-mono text-2xl text-primary">—</span>
+          </div>
+        </div>
+      </div>
+
       <!-- CLICK ANALYTICS -->
       <div class="border-b border-outline-variant p-6">
         <div class="flex justify-between items-center mb-6">
           <p class="font-label-mono text-[10px] text-primary/50 tracking-widest uppercase">Buy-Button Clicks</p>
-          <p class="font-label-mono text-[10px] tracking-widest uppercase text-primary/50">
-            <span class="inline-block w-2 h-2 bg-error mr-2 animate-pulse"></span>LIVE
-          </p>
+          <div class="flex items-center gap-6">
+            <button
+              id="reset-clicks"
+              class="font-label-mono text-[10px] tracking-widest uppercase text-primary/50 hover:text-error transition-colors"
+            >Reset Counter</button>
+            <p class="font-label-mono text-[10px] tracking-widest uppercase text-primary/50">
+              <span class="inline-block w-2 h-2 bg-error mr-2 animate-pulse"></span>LIVE
+            </p>
+          </div>
         </div>
         <div class="flex flex-col gap-8">
           {
@@ -148,6 +180,16 @@ const products = PRODUCTS.map((p) => ({ slug: p.slug, label: `${p.name} ${p.code
     });
   }
 
+  async function loadVisitors() {
+    const res = await fetch('/api/visit', { headers: { 'x-admin-key': getKey() } });
+    if (!res.ok) return;
+    const data = await res.json();
+    const online = document.getElementById('visitors-online');
+    const total = document.getElementById('visitors-total');
+    if (online) online.textContent = String(data.online ?? 0);
+    if (total) total.textContent = String(data.total ?? 0);
+  }
+
   let liveTimer: ReturnType<typeof setInterval> | null = null;
 
   function showPanel() {
@@ -156,12 +198,36 @@ const products = PRODUCTS.map((p) => ({ slug: p.slug, label: `${p.name} ${p.code
     logoutBtn.classList.remove('hidden');
     loadStocks();
     loadClicks();
-    // LIVE: auto-refresh klik tiap 3 detik (berhenti kalau tab gak kelihatan)
+    loadVisitors();
+    // LIVE: auto-refresh tiap 3 detik (berhenti kalau tab gak kelihatan)
     if (liveTimer) clearInterval(liveTimer);
     liveTimer = setInterval(() => {
-      if (!document.hidden) loadClicks();
+      if (!document.hidden) {
+        loadClicks();
+        loadVisitors();
+      }
     }, 3000);
   }
+
+  document.getElementById('reset-visits')?.addEventListener('click', async () => {
+    if (!confirm('Reset counter visitor (online + total views) ke 0? Gak bisa dibalikin.')) return;
+    const res = await fetch('/api/visit', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-admin-key': getKey() },
+      body: JSON.stringify({ reset: true }),
+    });
+    if (res.ok) loadVisitors();
+  });
+
+  document.getElementById('reset-clicks')?.addEventListener('click', async () => {
+    if (!confirm('Reset semua counter klik ke 0? Gak bisa dibalikin.')) return;
+    const res = await fetch('/api/clicks', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-admin-key': getKey() },
+      body: JSON.stringify({ reset: true }),
+    });
+    if (res.ok) loadClicks();
+  });
 
   async function login() {
     loginError.classList.add('hidden');

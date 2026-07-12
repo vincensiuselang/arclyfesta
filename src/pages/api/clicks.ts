@@ -23,6 +23,16 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return json({ ok: false }, 400);
   }
 
+  // Reset semua counter — admin only
+  if (body?.reset === true) {
+    const key = request.headers.get('x-admin-key');
+    if (!env.ADMIN_PASSWORD || !key || key !== env.ADMIN_PASSWORD) {
+      return json({ ok: false, error: 'unauthorized' }, 401);
+    }
+    await env.STOCK.put(KV_KEY, '{}');
+    return json({ ok: true });
+  }
+
   const product = String(body?.product ?? '').slice(0, 64);
   const channel = String(body?.channel ?? '');
   if (!product || !CHANNELS.includes(channel)) return json({ ok: false }, 400);
