@@ -20,7 +20,8 @@ export interface Product {
   name: string; // nama besar di halaman produk
   type: string; // jenis produk, misal "ZIP HOODIE"
   subtitle: string;
-  image: string; // path gambar di folder public/
+  image: string; // gambar di halaman detail produk (spec sheet)
+  imageCard?: string; // gambar di kartu homepage (kalau kosong, pakai image)
   specs: { label: string; value: string }[];
   // ↓↓↓ GANTI '#' DENGAN LINK MARKETPLACE LU ↓↓↓
   links: {
@@ -37,7 +38,8 @@ export const PRODUCTS: Product[] = [
     name: 'ARctICLE',
     type: 'ZIP HOODIE',
     subtitle: 'Heavyweight Fleece Structure',
-    image: '/assets/arcticle-0000.png',
+    image: '/assets/arcticle-0000-sheet.jpg',
+    imageCard: '/assets/arcticle-0000-card.jpg',
     specs: [
       { label: 'Material', value: '330GSM Fleece' },
       { label: 'Zip', value: 'Double YKK Zip' },

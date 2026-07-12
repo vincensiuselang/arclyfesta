@@ -76,7 +76,7 @@ import { SITE, PRODUCTS, NEXT_RECORD } from '../config';
               >
                 <div class="overflow-hidden relative min-h-[360px] md:min-h-[480px] flex items-center justify-center p-8">
                   <img
-                    src={product.image}
+                    src={product.imageCard ?? product.image}
                     alt={`${product.name.toUpperCase()} ${product.code} — ${product.type}`}
                     class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-[1.02]"
                   />
