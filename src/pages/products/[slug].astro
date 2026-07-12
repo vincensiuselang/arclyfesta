@@ -64,12 +64,15 @@ const marketplaces = [
 
       <!-- Technical Imagery -->
       <div
-        class="col-span-1 md:col-span-1 lg:col-span-7 border-b md:border-b-0 md:border-r border-outline-variant bg-background overflow-hidden relative min-h-[400px] md:min-h-[500px] flex items-center justify-center p-8"
+        class="col-span-1 md:col-span-1 lg:col-span-7 border-b md:border-b-0 md:border-r border-outline-variant bg-background overflow-hidden relative min-h-[400px] md:min-h-[500px] flex items-center justify-center p-8 cursor-zoom-in"
+        data-zoom-container
       >
         <img
           src={product.image}
           alt={`${product.name.toUpperCase()} ${product.code} — ${product.type} technical sheet`}
-          class="w-full h-full object-contain"
+          class="w-full h-full object-contain will-change-transform"
+          data-zoom
+          draggable="false"
         />
       </div>
 
@@ -158,6 +161,23 @@ const marketplaces = [
       .catch(() => {});
   }
   document.addEventListener('langchange', renderStock);
+
+  // Zoom lensa: area di bawah cursor diperbesar (cuma device yang punya hover/mouse)
+  const zoomContainer = document.querySelector<HTMLElement>('[data-zoom-container]');
+  const zoomImg = document.querySelector<HTMLElement>('[data-zoom]');
+  if (zoomContainer && zoomImg && window.matchMedia('(hover: hover)').matches) {
+    const ZOOM = 2.2;
+    zoomContainer.addEventListener('mousemove', (e) => {
+      const r = zoomImg.getBoundingClientRect();
+      const x = Math.max(0, Math.min(100, ((e.clientX - r.left) / r.width) * 100));
+      const y = Math.max(0, Math.min(100, ((e.clientY - r.top) / r.height) * 100));
+      zoomImg.style.transformOrigin = `${x}% ${y}%`;
+      zoomImg.style.transform = `scale(${ZOOM})`;
+    });
+    zoomContainer.addEventListener('mouseleave', () => {
+      zoomImg.style.transform = 'scale(1)';
+    });
+  }
 
   // Catat klik tombol beli (sendBeacon biar tetap kekirim walau pindah halaman)
   document.querySelectorAll<HTMLAnchorElement>('[data-buy-link]').forEach((link) => {
