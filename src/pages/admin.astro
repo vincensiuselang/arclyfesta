@@ -71,6 +71,33 @@ const products = PRODUCTS.map((p) => ({ slug: p.slug, label: `${p.name} ${p.code
         }
       </div>
 
+      <!-- CLICK ANALYTICS -->
+      <div class="border-b border-outline-variant p-6">
+        <div class="flex justify-between items-center mb-6">
+          <p class="font-label-mono text-[10px] text-primary/50 tracking-widest uppercase">Buy-Button Clicks</p>
+          <p class="font-label-mono text-[10px] tracking-widest uppercase text-primary/50">
+            <span class="inline-block w-2 h-2 bg-error mr-2 animate-pulse"></span>LIVE
+          </p>
+        </div>
+        <div class="flex flex-col gap-8">
+          {
+            products.map((p) => (
+              <div>
+                <p class="font-label-mono text-xs text-primary tracking-widest uppercase mb-3">{p.label}</p>
+                <div class="grid grid-cols-3 gap-3">
+                  {['tokopedia', 'shopee', 'tiktok'].map((ch) => (
+                    <div class="border border-outline-variant p-4 flex flex-col gap-1">
+                      <span class="font-label-mono text-[10px] text-primary/50 uppercase tracking-widest">{ch === 'tiktok' ? 'TikTok Shop' : ch}</span>
+                      <span class="font-label-mono text-2xl text-primary" data-click={`${p.slug}:${ch}`}>—</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
       <div class="p-6 flex items-center justify-between gap-4">
         <p id="save-status" class="font-label-mono text-[10px] tracking-widest uppercase text-primary/50"></p>
         <button
@@ -111,11 +138,29 @@ const products = PRODUCTS.map((p) => ({ slug: p.slug, label: `${p.name} ${p.code
     });
   }
 
+  async function loadClicks() {
+    const res = await fetch('/api/clicks', { headers: { 'x-admin-key': getKey() } });
+    if (!res.ok) return;
+    const data = await res.json();
+    document.querySelectorAll<HTMLElement>('[data-click]').forEach((el) => {
+      const [slug, channel] = el.dataset.click!.split(':');
+      el.textContent = String(data?.[slug]?.[channel] ?? 0);
+    });
+  }
+
+  let liveTimer: ReturnType<typeof setInterval> | null = null;
+
   function showPanel() {
     loginPanel.classList.add('hidden');
     stockPanel.classList.remove('hidden');
     logoutBtn.classList.remove('hidden');
     loadStocks();
+    loadClicks();
+    // LIVE: auto-refresh klik tiap 3 detik (berhenti kalau tab gak kelihatan)
+    if (liveTimer) clearInterval(liveTimer);
+    liveTimer = setInterval(() => {
+      if (!document.hidden) loadClicks();
+    }, 3000);
   }
 
   async function login() {
