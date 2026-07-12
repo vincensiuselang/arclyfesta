@@ -17,6 +17,11 @@ export const translations: Record<string, Record<string, string>> = {
     buy_tokopedia: 'BELI DI TOKOPEDIA',
     buy_shopee: 'BELI DI SHOPEE',
     buy_tiktok: 'BELI DI TIKTOK SHOP',
+    join_label: 'Milis',
+    join_title: 'Masuk Arsip',
+    join_sub: 'Jadi yang pertama saat record berikutnya rilis',
+    join_email: 'Alamat Email',
+    join_btn: 'Daftar',
   },
   zh: {
     view_archive: '查看档案',
@@ -31,14 +36,40 @@ export const translations: Record<string, Record<string, string>> = {
     buy_tokopedia: '在 TOKOPEDIA 购买',
     buy_shopee: '在 SHOPEE 购买',
     buy_tiktok: '在 TIKTOK SHOP 购买',
+    join_label: '邮件列表',
+    join_title: '加入档案',
+    join_sub: '新记录发布时，第一时间知晓',
+    join_email: '电子邮箱',
+    join_btn: '提交',
   },
 };
 
-/* Teks yang digenerate JavaScript (stock indicator) */
-export const jsStrings: Record<string, { stock: string; soldOut: string; soldOutSuffix: string }> = {
-  en: { stock: 'STOCK: ', soldOut: 'SOLD OUT', soldOutSuffix: ' — SOLD OUT' },
-  id: { stock: 'STOK: ', soldOut: 'STOK HABIS', soldOutSuffix: ' — STOK HABIS' },
-  zh: { stock: '库存：', soldOut: '已售罄', soldOutSuffix: ' — 已售罄' },
+/* Teks yang digenerate JavaScript (stock indicator, form subscribe) */
+export const jsStrings: Record<
+  string,
+  { stock: string; soldOut: string; soldOutSuffix: string; subOk: string; subErr: string }
+> = {
+  en: {
+    stock: 'STOCK: ',
+    soldOut: 'SOLD OUT',
+    soldOutSuffix: ' — SOLD OUT',
+    subOk: 'Recorded. You are in the archive.',
+    subErr: 'Invalid email.',
+  },
+  id: {
+    stock: 'STOK: ',
+    soldOut: 'STOK HABIS',
+    soldOutSuffix: ' — STOK HABIS',
+    subOk: 'Tercatat. Kamu resmi masuk arsip.',
+    subErr: 'Email tidak valid.',
+  },
+  zh: {
+    stock: '库存：',
+    soldOut: '已售罄',
+    soldOutSuffix: ' — 已售罄',
+    subOk: '已记录。你已加入档案。',
+    subErr: '邮箱格式无效。',
+  },
 };
 
 export const getLang = (): string => {

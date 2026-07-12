@@ -19,6 +19,18 @@ const { title, description = SITE.description, track = true } = Astro.props;
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="icon" type="image/png" href="/assets/monogram.png" />
+
+    <!-- Open Graph / link preview -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL('/assets/og.png', Astro.site ?? Astro.url.origin)} />
+    <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin)} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL('/assets/og.png', Astro.site ?? Astro.url.origin)} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -61,6 +73,26 @@ const { title, description = SITE.description, track = true } = Astro.props;
       document.querySelectorAll<HTMLElement>('[data-lang]').forEach((btn) => {
         btn.addEventListener('click', () => applyLang(btn.dataset.lang!));
       });
+
+      // Scroll reveal — fade-up halus tiap section masuk viewport
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const targets = document.querySelectorAll('main > *, footer');
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('reveal-in');
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.05 }
+        );
+        targets.forEach((el) => {
+          el.classList.add('reveal-init');
+          observer.observe(el);
+        });
+      }
     </script>
   </body>
 </html>

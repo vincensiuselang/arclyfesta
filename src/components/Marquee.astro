@@ -1,0 +1,11 @@
+---
+import { SITE } from '../config';
+
+const text = `${SITE.name} — EST. ${SITE.est} — THE ARCHIVE BEYOND — `;
+---
+
+<div class="border-y border-outline-variant overflow-hidden py-3 select-none" aria-hidden="true">
+  <div class="marquee-track flex whitespace-nowrap font-label-mono text-[10px] tracking-[0.3em] uppercase text-primary/40">
+    {Array.from({ length: 8 }).map(() => <span class="pr-12">{text}</span>)}
+  </div>
+</div>

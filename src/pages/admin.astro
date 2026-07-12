@@ -97,6 +97,25 @@ const products = PRODUCTS.map((p) => ({ slug: p.slug, label: `${p.name} ${p.code
         </div>
       </div>
 
+      <!-- SUBSCRIBERS -->
+      <div class="border-b border-outline-variant p-6">
+        <div class="flex justify-between items-center mb-6">
+          <p class="font-label-mono text-[10px] text-primary/50 tracking-widest uppercase">
+            Subscribers // <span id="subs-count">0</span>
+          </p>
+          <button
+            id="copy-subs"
+            class="font-label-mono text-[10px] tracking-widest uppercase text-primary/50 hover:text-primary transition-colors"
+          >Copy All</button>
+        </div>
+        <div
+          id="subs-list"
+          class="border border-outline-variant max-h-48 overflow-y-auto font-label-mono text-xs text-primary/80 divide-y divide-outline-variant/50"
+        >
+          <p class="p-4 text-primary/40 uppercase tracking-widest text-[10px]">No subscribers yet</p>
+        </div>
+      </div>
+
       <!-- CLICK ANALYTICS -->
       <div class="border-b border-outline-variant p-6">
         <div class="flex justify-between items-center mb-6">
@@ -190,6 +209,32 @@ const products = PRODUCTS.map((p) => ({ slug: p.slug, label: `${p.name} ${p.code
     if (total) total.textContent = String(data.total ?? 0);
   }
 
+  let subEmails: string[] = [];
+
+  async function loadSubs() {
+    const res = await fetch('/api/subscribe', { headers: { 'x-admin-key': getKey() } });
+    if (!res.ok) return;
+    const subs: { email: string; ts: number }[] = await res.json();
+    subEmails = subs.map((s) => s.email);
+    const count = document.getElementById('subs-count');
+    if (count) count.textContent = String(subs.length);
+    const list = document.getElementById('subs-list');
+    if (list && subs.length > 0) {
+      list.innerHTML = subs
+        .slice()
+        .reverse()
+        .map(
+          (s) =>
+            `<div class="p-3 flex justify-between gap-4"><span>${s.email.replace(/</g, '&lt;')}</span><span class="text-primary/40">${new Date(s.ts).toLocaleDateString('id-ID')}</span></div>`
+        )
+        .join('');
+    }
+  }
+
+  document.getElementById('copy-subs')?.addEventListener('click', () => {
+    navigator.clipboard.writeText(subEmails.join('\n'));
+  });
+
   let liveTimer: ReturnType<typeof setInterval> | null = null;
 
   function showPanel() {
@@ -199,12 +244,14 @@ const products = PRODUCTS.map((p) => ({ slug: p.slug, label: `${p.name} ${p.code
     loadStocks();
     loadClicks();
     loadVisitors();
+    loadSubs();
     // LIVE: auto-refresh tiap 3 detik (berhenti kalau tab gak kelihatan)
     if (liveTimer) clearInterval(liveTimer);
     liveTimer = setInterval(() => {
       if (!document.hidden) {
         loadClicks();
         loadVisitors();
+        loadSubs();
       }
     }, 3000);
   }

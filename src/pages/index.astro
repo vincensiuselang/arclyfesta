@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import Marquee from '../components/Marquee.astro';
 import { SITE, PRODUCTS, NEXT_RECORD } from '../config';
 ---
 
@@ -39,6 +40,8 @@ import { SITE, PRODUCTS, NEXT_RECORD } from '../config';
         </a>
       </div>
     </section>
+
+    <Marquee />
 
     <!-- Archive / Products -->
     <section
@@ -133,6 +136,34 @@ import { SITE, PRODUCTS, NEXT_RECORD } from '../config';
         </p>
       </div>
     </section>
+
+    <!-- Join the Archive (email capture) -->
+    <section class="w-full max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop pb-section-gap">
+      <div class="max-w-xl mx-auto border border-outline-variant bg-surface-container-lowest p-8 md:p-12 flex flex-col gap-10">
+        <div class="text-center">
+          <p class="font-label-mono text-[10px] text-primary/50 tracking-widest uppercase mb-3" data-i18n="join_label">Mailing List</p>
+          <p class="text-headline-lg-mobile font-headline-lg text-primary uppercase" data-i18n="join_title">Join the Archive</p>
+          <p class="font-label-mono text-[10px] text-primary/50 tracking-widest uppercase mt-3" data-i18n="join_sub">Be first when the next record drops</p>
+        </div>
+        <form id="subscribe-form" class="flex flex-col md:flex-row gap-6 md:gap-4 md:items-end" novalidate>
+          <div class="flex-1 w-full flex flex-col gap-2">
+            <label for="sub-email" class="font-label-mono text-[10px] text-primary/50 uppercase tracking-widest" data-i18n="join_email">Email Address</label>
+            <input
+              id="sub-email"
+              type="email"
+              autocomplete="email"
+              class="bg-transparent border-0 border-b border-primary rounded-none px-0 py-2 font-label-mono text-sm text-primary focus:ring-0 focus:border-primary focus:outline-none w-full"
+            />
+          </div>
+          <button
+            type="submit"
+            class="bg-primary text-on-primary font-label-mono text-xs tracking-widest uppercase px-8 py-4 border border-primary hover:bg-background hover:text-primary transition-colors duration-300"
+            data-i18n="join_btn"
+          >Submit</button>
+        </form>
+        <p id="subscribe-msg" class="font-label-mono text-[10px] tracking-widest uppercase text-center hidden"></p>
+      </div>
+    </section>
   </main>
 
   <Footer />
@@ -170,4 +201,33 @@ import { SITE, PRODUCTS, NEXT_RECORD } from '../config';
     })
     .catch(() => {});
   document.addEventListener('langchange', renderBadges);
+
+  // Form Join the Archive
+  const form = document.getElementById('subscribe-form') as HTMLFormElement | null;
+  const emailInput = document.getElementById('sub-email') as HTMLInputElement | null;
+  const msg = document.getElementById('subscribe-msg');
+  let subStatus: 'ok' | 'err' | null = null;
+
+  function renderSubMsg() {
+    if (!msg || !subStatus) return;
+    const s = jsStrings[getLang()] ?? jsStrings.en;
+    msg.classList.remove('hidden');
+    msg.textContent = subStatus === 'ok' ? s.subOk : s.subErr;
+    msg.classList.toggle('text-error', subStatus === 'err');
+    msg.classList.toggle('text-primary/70', subStatus === 'ok');
+  }
+  document.addEventListener('langchange', renderSubMsg);
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = emailInput?.value.trim() ?? '';
+    const res = await fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email }),
+    }).catch(() => null);
+    subStatus = res?.ok ? 'ok' : 'err';
+    if (res?.ok && emailInput) emailInput.value = '';
+    renderSubMsg();
+  });
 </script>
