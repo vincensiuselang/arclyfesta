@@ -18,6 +18,10 @@ const marketplaces = [
   { label: 'BUY ON SHOPEE', href: product.links.shopee, channel: 'shopee' },
   { label: 'BUY ON TIKTOK SHOP', href: product.links.tiktok, channel: 'tiktok' },
 ];
+
+const sizes = product.sizes ?? ['S', 'M', 'L', 'XL'];
+const waNumber = SITE.whatsapp;
+const waBaseText = `Halo ${SITE.name}! Mau order: ${product.name.toUpperCase()} ${product.code} — ${product.type}`;
 ---
 
 <Base
@@ -78,24 +82,51 @@ const marketplaces = [
 
       <!-- Details & Purchasing -->
       <div class="col-span-1 md:col-span-1 lg:col-span-5 flex flex-col bg-surface-container-lowest">
-        <!-- Technical Data -->
-        <div class="flex-grow p-6 md:p-8 flex flex-col justify-center gap-8 border-b border-outline-variant">
-          <div class="grid grid-cols-2 gap-y-8 gap-x-4">
-            {
-              product.specs.map((spec) => (
-                <div class="flex flex-col gap-2">
-                  <span class="font-label-mono text-[10px] text-primary/50 uppercase tracking-widest border-b border-outline-variant/50 pb-1">
-                    {spec.label}
-                  </span>
-                  <span class="font-label-mono text-xs text-primary uppercase">{spec.value}</span>
-                </div>
-              ))
-            }
-          </div>
-        </div>
-
         <!-- Marketplace Links (isi link-nya di src/config.ts) -->
-        <div id="purchase" class="flex flex-col bg-background">
+        <div id="purchase" class="flex-grow flex flex-col bg-background">
+          {
+            waNumber && (
+              <>
+                <!-- Size picker -->
+                <div class="p-6 border-b border-outline-variant flex flex-col gap-4" data-size-section>
+                  <span class="font-label-mono text-[10px] text-primary/50 uppercase tracking-widest" data-i18n="select_size">
+                    Select Size
+                  </span>
+                  <div class="flex flex-wrap gap-2">
+                    {sizes.map((size) => (
+                      <button
+                        type="button"
+                        data-size={size}
+                        class="font-label-mono text-xs border border-outline-variant px-5 py-2.5 text-primary/70 hover:border-primary hover:text-primary transition-colors uppercase tracking-widest"
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <!-- ORDER VIA WHATSAPP (paling atas) -->
+                <a
+                  class="group flex items-center justify-between p-6 border-b border-outline-variant bg-primary text-on-primary hover:bg-background hover:text-primary transition-colors"
+                  href={`https://wa.me/${waNumber}?text=${encodeURIComponent(waBaseText)}`}
+                  target="_blank"
+                  rel="noopener"
+                  data-buy-link
+                  data-channel="whatsapp"
+                  data-wa-order
+                  data-wa-number={waNumber}
+                  data-wa-base={waBaseText}
+                >
+                  <span class="font-label-mono text-xs tracking-widest uppercase" data-i18n="order_wa">
+                    ORDER DIRECT — WHATSAPP
+                  </span>
+                  <span class="material-symbols-outlined text-sm transition-transform group-hover:translate-x-1">
+                    arrow_outward
+                  </span>
+                </a>
+              </>
+            )
+          }
           {
             marketplaces.map((mp, i) => (
               <a
@@ -144,9 +175,9 @@ const marketplaces = [
       indicator.textContent = s.soldOut;
       indicator.classList.add('text-error');
       indicator.classList.remove('text-primary/80');
-      document.querySelectorAll('[data-buy-link]').forEach((link) => {
-        link.classList.add('pointer-events-none', 'opacity-30');
-        (link as HTMLAnchorElement).removeAttribute('href');
+      document.querySelectorAll('[data-buy-link], [data-size-section]').forEach((el) => {
+        el.classList.add('pointer-events-none', 'opacity-30');
+        if (el.hasAttribute('href')) el.removeAttribute('href');
       });
     }
   }
@@ -178,6 +209,32 @@ const marketplaces = [
       zoomImg.style.transform = 'scale(1)';
     });
   }
+
+  // Size picker → update pesan WhatsApp sesuai size yang dipilih
+  const waOrder = document.querySelector<HTMLAnchorElement>('[data-wa-order]');
+  const sizeBtns = document.querySelectorAll<HTMLButtonElement>('[data-size]');
+  let selectedSize = '';
+
+  function updateWaHref() {
+    if (!waOrder || !waOrder.dataset.waNumber) return;
+    const text = `${waOrder.dataset.waBase}${selectedSize ? ` (Size ${selectedSize})` : ''}`;
+    waOrder.href = `https://wa.me/${waOrder.dataset.waNumber}?text=${encodeURIComponent(text)}`;
+  }
+
+  sizeBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      selectedSize = btn.dataset.size!;
+      sizeBtns.forEach((b) => {
+        const active = b === btn;
+        b.classList.toggle('bg-primary', active);
+        b.classList.toggle('text-on-primary', active);
+        b.classList.toggle('border-primary', active);
+        b.classList.toggle('text-primary/70', !active);
+        b.classList.toggle('border-outline-variant', !active);
+      });
+      updateWaHref();
+    });
+  });
 
   // Catat klik tombol beli (sendBeacon biar tetap kekirim walau pindah halaman)
   document.querySelectorAll<HTMLAnchorElement>('[data-buy-link]').forEach((link) => {

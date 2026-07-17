@@ -22,6 +22,8 @@ export const translations: Record<string, Record<string, string>> = {
     join_sub: 'Jadi yang pertama saat record berikutnya rilis',
     join_email: 'Alamat Email',
     join_btn: 'Daftar',
+    select_size: 'Pilih Ukuran',
+    order_wa: 'ORDER LANGSUNG — WHATSAPP',
   },
   zh: {
     view_archive: '查看档案',
@@ -41,6 +43,8 @@ export const translations: Record<string, Record<string, string>> = {
     join_sub: '新记录发布时，第一时间知晓',
     join_email: '电子邮箱',
     join_btn: '提交',
+    select_size: '选择尺码',
+    order_wa: 'WHATSAPP 直接下单',
   },
 };
 

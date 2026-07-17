@@ -10,7 +10,7 @@ const products = PRODUCTS.map((p) => ({ slug: p.slug, label: `${p.name} ${p.code
     class="bg-background border-b border-outline-variant fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop h-20"
   >
     <a href="/" class="font-label-mono text-[10px] text-primary/50 hover:text-primary transition-colors tracking-widest uppercase">← Back to site</a>
-    <img alt="ARCLYFESTA Monogram" class="h-10 w-auto object-contain" src="/assets/monogram.png" />
+    <img alt="ARCLYFESTA Monogram" class="h-10 w-auto object-contain absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" src="/assets/monogram.png" />
     <button
       id="logout-btn"
       class="font-label-mono text-[10px] text-primary/50 hover:text-primary transition-colors tracking-widest uppercase hidden"
@@ -135,8 +135,8 @@ const products = PRODUCTS.map((p) => ({ slug: p.slug, label: `${p.name} ${p.code
             products.map((p) => (
               <div>
                 <p class="font-label-mono text-xs text-primary tracking-widest uppercase mb-3">{p.label}</p>
-                <div class="grid grid-cols-3 gap-3">
-                  {['tokopedia', 'shopee', 'tiktok'].map((ch) => (
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {['tokopedia', 'shopee', 'tiktok', 'whatsapp'].map((ch) => (
                     <div class="border border-outline-variant p-4 flex flex-col gap-1">
                       <span class="font-label-mono text-[10px] text-primary/50 uppercase tracking-widest">{ch === 'tiktok' ? 'TikTok Shop' : ch}</span>
                       <span class="font-label-mono text-2xl text-primary" data-click={`${p.slug}:${ch}`}>—</span>

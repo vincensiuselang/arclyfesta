@@ -3,7 +3,7 @@ import type { APIRoute } from 'astro';
 export const prerender = false;
 
 const KV_KEY = 'clicks';
-const CHANNELS = ['tokopedia', 'shopee', 'tiktok'];
+const CHANNELS = ['tokopedia', 'shopee', 'tiktok', 'whatsapp'];
 
 const json = (data: unknown, status = 200) =>
   new Response(JSON.stringify(data), {

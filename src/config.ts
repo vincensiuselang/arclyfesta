@@ -12,6 +12,10 @@ export const SITE = {
   year: 2026,
 
   instagram: 'https://www.instagram.com/arclyfesta?igsh=ZjQ5OWFoMXB4ZTZw',
+
+  // ↓↓↓ NOMOR WHATSAPP BUAT TERIMA ORDER — format internasional tanpa + dan tanpa 0 di depan.
+  // Contoh: 081234567890 jadi '6281234567890'. Kosongin ('') = tombol order gak muncul.
+  whatsapp: '6285947094014',
 };
 
 export interface Product {
@@ -22,6 +26,7 @@ export interface Product {
   subtitle: string;
   image: string; // gambar di halaman detail produk (spec sheet)
   imageCard?: string; // gambar di kartu homepage (kalau kosong, pakai image)
+  sizes?: string[]; // pilihan ukuran buat order WA (default S M L XL)
   specs: { label: string; value: string }[];
   // ↓↓↓ GANTI '#' DENGAN LINK MARKETPLACE LU ↓↓↓
   links: {
@@ -40,6 +45,7 @@ export const PRODUCTS: Product[] = [
     subtitle: 'Heavyweight Fleece Structure',
     image: '/assets/arcticle-0000-sheet.jpg',
     imageCard: '/assets/arcticle-0000-card.jpg',
+    sizes: ['S', 'M', 'L', 'XL'],
     specs: [
       { label: 'Material', value: '330GSM Fleece' },
       { label: 'Zip', value: 'Double YKK Zip' },
